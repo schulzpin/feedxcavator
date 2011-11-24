@@ -54,10 +54,10 @@ need to manually update it in Google Reader to get the update in Feedly.
 ### Private Deployment
 
 You may [install](http://code.google.com/appengine/docs/java/gettingstarted/uploading.html) 
-a private instance of the application on your GAE account, and only 
-the account owner will be able to create or manage feeds (but still 
-will be able to share feed links). The only thing you need to do is to fill in 
-application id in the 'appengine-web.xml' file.
+a private [instance](https://github.com/downloads/GChristensen/feedxcavator/feedxcavator-0.1-private-deploy.zip)
+of the application on your GAE account, and only the account owner will be able 
+to create or manage feeds (but still will be able to share feed links). The only 
+thing you need to do is to fill in application id in the 'appengine-web.xml' file.
 
 It possible to create custom data extractors (called 'excavators' here)
 when using a private deployment if additional processing logic is necessary.
@@ -65,11 +65,10 @@ See __DefaultExcavator__ in the 'excavation.clj' file for an example.
 
 ###Hacking on the Application Source Code
 
-* If you used 'lein appengine-prepare' command to build a binary distribution,
+* If you have used 'lein appengine-prepare' command to build a binary distribution,
 before loading and compiling the application in REPL for interactive development 
 you need to clean the distribution with Leiningen's 'lein clean' command 
-(or simply delete the 'classes' folder) and also comment out the following 
-directive in project.clj: 
+and also comment out the following directive in project.clj: 
 :aot [feedxcavator.app_servlet ...]. 
 Do not forget to uncomment it when using 'appengine-prepare' command again 
 (these issues are related to appengine-magic library).
