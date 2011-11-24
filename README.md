@@ -54,7 +54,7 @@ need to manually update it in Google Reader to get the update in Feedly.
 ### Private Deployment
 
 You may [install](http://code.google.com/appengine/docs/java/gettingstarted/uploading.html) 
-a private [instance](https://github.com/downloads/GChristensen/feedxcavator/)
+a private [instance](https://github.com/GChristensen/feedxcavator/downloads)
 of the application on your GAE account, and only the account owner will be able 
 to create or manage feeds (but still will be able to share feed links). The only 
 thing you need to do is to fill in application id in the 'appengine-web.xml' file.
@@ -72,7 +72,7 @@ and also comment out the following directive in project.clj:
 :aot [feedxcavator.app_servlet ...]. 
 Do not forget to uncomment it when using 'appengine-prepare' command again 
 (these issues are related to appengine-magic library).
-* Compojure does not work on GAE as is, so to be able to deploy your verson 
+* Compojure does not work on GAE as is, so to be able to deploy custom verson 
 of the application on GAE you need to comment out a couple of lines related 
 to multipart params in compojure's handler.clj file after you executed 
 'lein deps' command, starting, probably, from the maven local cache.
