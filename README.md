@@ -2,11 +2,11 @@
 
 Feedxcavator is a HTML to RSS conversion application written entirely in Clojure 
 and ClojureScript. It uses a limited set of CSS selectors to extract content 
-from HTML pages and convert them to RSS feeds. You may find it useful if a web 
+of HTML pages and convert them to RSS feeds. You may find it useful if a web 
 page does not provide RSS and you are able to analyze the source code of that 
 page to write selectors for the data you interested in 
-([Firebug](http://getfirebug.com) development extensions may greatly aid on 
-this, although they not always map page source precisely).
+([Firebug](http://getfirebug.com) or your browser development extensions may 
+greatly aid on this, although they not always map page source precisely).
 
 
 ### Supported CSS Subset
