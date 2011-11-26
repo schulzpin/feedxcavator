@@ -7,6 +7,8 @@
          net.cgrand.enlive-html
          clojure.walk))
 
+(def ^:const +xml-header+ "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
+
 (defn fix-relative
   "Transforms relative URLs to absolute (may be needed by a feed reader for headline identification purposes)."
   [url feed-settings]
@@ -68,26 +70,58 @@ Returns list of hash-maps with extracted headline data (hash map keys correspond
      (let [remember-recent (:remember-recent feed-settings)
            recent-article (:recent-article feed-settings)]
        (if (and (seq headlines) remember-recent)
-         (let [id-extractor (or id-extractor identity)
-               feed-settings (assoc feed-settings :recent-article (id-extractor (:link (first headlines))))]
+         (let [id-extractor (or id-extractor (fn [h] (:link h)))
+               feed-settings (assoc feed-settings :recent-article (id-extractor (first headlines)))]
            (api/store-feed! feed-settings)
-           (take-while #(not= (id-extractor (:link %)) recent-article) headlines))
+           (take-while #(not= (id-extractor %) recent-article) headlines))
          headlines))))
+
+(defmacro error-headline [feed title description & body]
+  `(at ~feed
+       ~title (content "Error")
+       ~description
+       (content "Probably Feedxcavator selectors are out of sync with the resource markup.")
+       ~@body))
+
+(defn make-atom-feed [entities feed-settings]
+  (let [updated (fmt/unparse (fmt/formatter "yyyy-MM-dd'T'HH:mm:ss'Z'") (tm/now))
+        feed-w-head (at (xml-resource (api/get-resource-as-stream "atom.xml"))
+                        [:feed] (set-attr :xml:base (api/sanitize (:target-url feed-settings)))
+                        [:feed :> :id] (content (:target-url feed-settings))
+                        [:feed :> :title] (content (:feed-title feed-settings))
+                        [:feed :> :updated] (content updated))]
+    (let [feed (if (:out-of-sync (meta entities))
+                 (error-headline feed-w-head
+                                 [:feed :> :entry :> :title]
+                                 [:feed :> :entry :> :summary]
+                                 [:feed :> :entry :> :id] (content (:target-url feed-settings))
+                                 [:feed :> :entry :> :updated] (content updated)
+                                 [:feed :> :entry :> [:link (attr= :rel "alternate")]]
+                                 (set-attr :href (:target-url feed-settings)))
+                 (transform feed-w-head [:feed :> :entry]
+                            (clone-for [entity entities]
+                                       [:id] (content (:link entity))
+                                       [:title] (content (:title entity))
+                                       [:updated] (content updated)
+                                       [:summary] (content (:summary entity))
+                                       [[:link (attr= :rel "alternate")]] (set-attr :href (:link entity))
+                                       [[:link (attr= :rel "enclosure")]] (when (:image entity)
+                                                                            (set-attr :href (:image entity))))))]
+      (apply str (cons +xml-header+ (emit* feed))))))
 
 (defn make-rss-feed 
   "Transform the list of hash-maps with extracted headline data to a RSS feed XML representation."
   [headlines feed-settings]
   (let [feed-w-head (at (xml-resource (api/get-resource-as-stream "rss.xml"))
                         [:rss] (set-attr :xml:base (api/sanitize (:target-url feed-settings)))
-                        [:channel :> :link] (content (api/sanitize (:target-url feed-settings)))
-                        [:channel :> :title] (content (api/sanitize (:feed-title feed-settings)))
-                        [:channel :> :pubDate] (content (fmt/unparse (:rfc822 fmt/formatters) (tm/now))))]
+                        [:channel :> :link] (content (:target-url feed-settings))
+                        [:channel :> :title] (content (:feed-title feed-settings))
+                        [:channel :> :pubDate] (content (:rfc822 fmt/formatters) (tm/now)))]
     (let [feed (if (:out-of-sync (meta headlines))
-                 (at feed-w-head
-                     [:channel :> :item :> :title] (content "Error")
-                     [:channel :> :item :> :description]
-                     (content "Probably Feedxcavator selectors are out of sync with the resource markup.")
-                     [:channel :> :item :> :link] (content (:target-url feed-settings)))
+                 (error-headline feed-w-head
+                                 [:channel :> :item :> :title] 
+                                 [:channel :> :item :> :description]
+                                 [:channel :> :item :> :link] (content (:target-url feed-settings)))
                  (transform feed-w-head [:channel :> :item]
                             (clone-for [headline headlines]
                                        [:title] (content (:title headline))
@@ -97,7 +131,7 @@ Returns list of hash-maps with extracted headline data (hash map keys correspond
                                                       (do->
                                                        (set-attr :url (:image headline))
                                                        (set-attr :type (ext-mime-type (:image headline))))))))]
-      (apply str (cons "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" (emit* feed))))))
+      (apply str (cons +xml-header+ (emit* feed))))))
 
 (defprotocol HTMLExcavator
   "HTML to feed conversion routine protocol"
