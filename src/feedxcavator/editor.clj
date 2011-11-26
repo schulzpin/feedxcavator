@@ -60,6 +60,12 @@
                                       (enlive/transform [:#service-links]
                                                         (fn [node]
                                                           (when (not api/+public-deploy+) node)))
+                                      (enlive/transform [:#feed-link]
+                                                        (enlive/do->
+                                                         (enlive/set-attr :title (:feed-title feed-settings))
+                                                         (enlive/set-attr :href (str api/*app-host*
+                                                                                     api/+feed-url-base+
+                                                                                     (:uuid feed-settings)))))
                                       (enlive/transform [:#save]
                                                         (enlive/content "Save"))))))
       (api/page-not-found))))
@@ -127,15 +133,21 @@
         selectors (read-selectors (:selectors feed-settings))]
     (assoc feed-settings :enlive-selectors selectors)))
 
-(defn html-escape-feed [feed]
+;; a straightforward compensation for not so perfect enlive output
+(defn fix-glued-tags [feed]
   (case (first feed)
     "application/rss+xml"
-    ;; the next line is a straightforward compensation for not so perfect enlive output
-    (let [feed (.replace (second feed) "</item><item>" "</item>\n\n&nbsp;&nbsp;&nbsp;&nbsp;<item>")
-          feed (str/escape (api/sanitize feed) {\space  "&nbsp;"})
-          feed (.replace feed "\n" "<br/>")]
-      (str "<div id=\"feed-content\">" feed "</div>"))))
-     
+    (.replace (second feed) "</item><item>" "</item>\n\n&nbsp;&nbsp;&nbsp;&nbsp;<item>")
+    "application/atom+xml"
+    (.replace (second feed) "</entry><entry>" "</entry>\n\n&nbsp;&nbsp;&nbsp;&nbsp;<entry>")
+    (second feed)))
+
+(defn html-escape-feed [feed]
+  (let [feed (fix-glued-tags feed)
+        feed (str/escape (api/sanitize feed) {\space  "&nbsp;"})
+        feed (.replace feed "\n" "<br/>")]
+    (str "<div id=\"feed-content\">" feed "</div>")))
+
 (defn perform-test [feed-settings]
   (let [;; turn off read headline filtering
         feed-settings (assoc feed-settings :remember-recent nil)]

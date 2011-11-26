@@ -83,31 +83,37 @@ Returns list of hash-maps with extracted headline data (hash map keys correspond
        (content "Probably Feedxcavator selectors are out of sync with the resource markup.")
        ~@body))
 
-(defn make-atom-feed [entities feed-settings]
-  (let [updated (fmt/unparse (fmt/formatter "yyyy-MM-dd'T'HH:mm:ss'Z'") (tm/now))
-        feed-w-head (at (xml-resource (api/get-resource-as-stream "atom.xml"))
-                        [:feed] (set-attr :xml:base (api/sanitize (:target-url feed-settings)))
-                        [:feed :> :id] (content (:target-url feed-settings))
-                        [:feed :> :title] (content (:feed-title feed-settings))
-                        [:feed :> :updated] (content updated))]
-    (let [feed (if (:out-of-sync (meta entities))
-                 (error-headline feed-w-head
-                                 [:feed :> :entry :> :title]
-                                 [:feed :> :entry :> :summary]
-                                 [:feed :> :entry :> :id] (content (:target-url feed-settings))
-                                 [:feed :> :entry :> :updated] (content updated)
-                                 [:feed :> :entry :> [:link (attr= :rel "alternate")]]
-                                 (set-attr :href (:target-url feed-settings)))
-                 (transform feed-w-head [:feed :> :entry]
-                            (clone-for [entity entities]
-                                       [:id] (content (:link entity))
-                                       [:title] (content (:title entity))
-                                       [:updated] (content updated)
-                                       [:summary] (content (:summary entity))
-                                       [[:link (attr= :rel "alternate")]] (set-attr :href (:link entity))
-                                       [[:link (attr= :rel "enclosure")]] (when (:image entity)
-                                                                            (set-attr :href (:image entity))))))]
-      (apply str (cons +xml-header+ (emit* feed))))))
+(defn make-atom-feed
+  ([headlines feed-settings]
+     (make-atom-feed headlines nil feed-settings))
+
+  ([headlines headline-id-gen feed-settings]
+     (let [updated (fmt/unparse (fmt/formatter "yyyy-MM-dd'T'HH:mm:ss'Z'") (tm/now))
+           feed-w-head (at (xml-resource (api/get-resource-as-stream "atom.xml"))
+                           [:feed] (set-attr :xml:base (api/sanitize (:target-url feed-settings)))
+                           [:feed :> :id] (content (:target-url feed-settings))
+                           [:feed :> :title] (content (:feed-title feed-settings))
+                           [:feed :> :updated] (content updated))]
+       (let [headline-id-gen (or headline-id-gen (fn [h] (:link h)))
+             feed (if (:out-of-sync (meta headlines))
+                    (error-headline feed-w-head
+                                    [:feed :> :entry :> :title]
+                                    [:feed :> :entry :> :summary]
+                                    [:feed :> :entry :> :id] (content (:target-url feed-settings))
+;;                                    [:feed :> :entry :> :updated] (content updated)
+                                    [:feed :> :entry :> [:link (attr= :rel "alternate")]]
+                                    (set-attr :href (:target-url feed-settings)))
+                    (transform feed-w-head [:feed :> :entry]
+                               (clone-for [headline headlines]
+                                          [:id] (content (headline-id-gen headline))
+                                          [:title] (content (:title headline))
+                                          [:updated] (content updated)
+                                          [:summary] (content (:summary headline))
+                                          [[:link (attr= :rel "alternate")]] (set-attr :href (:link headline))
+                                          [[:link (attr= :rel "enclosure")]] (when (:image headline)
+                                                                               (set-attr :href
+                                                                                         (:image headline))))))]
+      (apply str (cons +xml-header+ (emit* feed)))))))
 
 (defn make-rss-feed 
   "Transform the list of hash-maps with extracted headline data to a RSS feed XML representation."

@@ -9,6 +9,6 @@
                  [enlive "1.0.0"]
                  [clj-time "0.3.3"]]
   :aot [feedxcavator.app_servlet
-        feedxcavator.custom.digg
+        feedxcavator.custom.atomid
         feedxcavator.custom.linkid]
   :dev-dependencies [[appengine-magic "0.4.6-SNAPSHOT"]])
