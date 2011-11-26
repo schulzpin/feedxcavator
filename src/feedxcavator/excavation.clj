@@ -110,9 +110,11 @@ Returns list of hash-maps with extracted headline data (hash map keys correspond
                                           [:updated] (content updated)
                                           [:summary] (content (:summary headline))
                                           [[:link (attr= :rel "alternate")]] (set-attr :href (:link headline))
-                                          [[:link (attr= :rel "enclosure")]] (when (:image headline)
-                                                                               (set-attr :href
-                                                                                         (:image headline))))))]
+                                          [[:link (attr= :rel "enclosure")]]
+                                          (when (:image headline)
+                                            (do->
+                                             (set-attr :type (ext-mime-type (:image headline)))
+                                             (set-attr :href (:image headline)))))))]
       (apply str (cons +xml-header+ (emit* feed)))))))
 
 (defn make-rss-feed 
