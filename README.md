@@ -59,7 +59,7 @@ of the application on your GAE account, and only the account owner will be able
 to create or manage feeds (but still will be able to share feed links). The only 
 thing you need to do is to fill in application id in the 'appengine-web.xml' file.
 
-It possible to create custom data extractors (called 'excavators' here)
+It's possible to create custom data extractors (called 'excavators' here)
 when using a private deployment if additional processing logic is necessary.
 See __DefaultExcavator__ in the 'excavation.clj' file for an example.
 
