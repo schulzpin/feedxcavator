@@ -113,14 +113,16 @@
 (defn read-selectors [selectors]
   (let [selectors-kv
         (for [kv selectors]
-          (let [selector-set (second kv)
-                selector-lines (str/split selector-set #"\n")
-                selectors (for [line selector-lines]
-                            (let [line (str/trim line)]
-                              (if (re-matches #"^\[.*\]$" line)
-                                (read-string line)
-                                (css-to-enlive line))))]
-            [(first kv) (apply vector selectors)]))]
+          (let [selector-set (second kv)]
+            (if selector-set
+              (let [selector-lines (str/split selector-set #"\n")
+                    selectors (for [line selector-lines]
+                                (let [line (str/trim line)]
+                                  (if (re-matches #"^\[.*\]$" line)
+                                    (read-string line)
+                                    (css-to-enlive line))))]
+                [(first kv) (apply vector selectors)])
+              [(first kv) nil])))]         
     (apply hash-map (apply concat selectors-kv))))
 
 (defn read-feed-settings [request]
@@ -153,7 +155,10 @@
         feed-settings (assoc feed-settings :remember-recent nil)]
       (let [feed (excv/perform-excavation feed-settings)]
         (cond
-         (:out-of-sync (meta feed)) (throw (Exception. "Probably, selectors do not match."))
+         (:out-of-sync (meta feed))
+         ;; a little hack to permit raw feed transfoming excavators such as DiggAtomCommentsBypasser
+         (if (not= "ignore" (:headline (:selectors feed-settings)))
+           (throw (Exception. "Probably, selectors do not match.")))
          :default (str (:n-articles (meta feed)) " headlines extracted from the target location:<br/><br/>"
                        (html-escape-feed feed))))))
 

@@ -28,17 +28,18 @@ Returns list of hash-maps with extracted headline data (hash map keys correspond
   [doc-tree feed-settings]
   (let [selectors (:enlive-selectors feed-settings)]
     (letfn [(get-selector [key n] ; get selector fom a set numbered n, get the first selector otherwise
-              (let [sel (selectors key)
-                    sel (if (>= (dec (count sel)) n)
-                          (get sel n)
-                          (first sel))]
-                (postwalk #(if (symbol? %) (resolve %) %) sel)))]
+              (let [sel (selectors key)]
+                (when sel
+                  (let [sel (if (>= (dec (count sel)) n)
+                              (get sel n)
+                              (first sel))]
+                    (postwalk #(if (symbol? %) (resolve %) %) sel)))))]
       (loop [n 0 selector-set (:headline selectors) headlines (transient [])]
         (let [headline-sel (first selector-set)]
           (if headline-sel
             (do
               (doseq [headline-html (select doc-tree headline-sel)]
-                (letfn [(select-element [category] ; select an element from headline html
+                (letfn [(select-element [category] ; select an element from headline html                         
                           (first (select headline-html (get-selector category n))))
                         (get-content [selection] ; get the selected element content
                           (apply str (emit* (:content selection))))
@@ -124,7 +125,7 @@ Returns list of hash-maps with extracted headline data (hash map keys correspond
                         [:rss] (set-attr :xml:base (api/sanitize (:target-url feed-settings)))
                         [:channel :> :link] (content (:target-url feed-settings))
                         [:channel :> :title] (content (:feed-title feed-settings))
-                        [:channel :> :pubDate] (content (:rfc822 fmt/formatters) (tm/now)))]
+                        [:channel :> :pubDate] (content (fmt/unparse (:rfc822 fmt/formatters) (tm/now))))]
     (let [feed (if (:out-of-sync (meta headlines))
                  (error-headline feed-w-head
                                  [:channel :> :item :> :title] 

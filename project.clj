@@ -10,5 +10,6 @@
                  [clj-time "0.3.3"]]
   :aot [feedxcavator.app_servlet
         feedxcavator.custom.atomid
-        feedxcavator.custom.linkid]
+        feedxcavator.custom.linkid
+        feedxcavator.custom.digg]
   :dev-dependencies [[appengine-magic "0.4.6-SNAPSHOT"]])
