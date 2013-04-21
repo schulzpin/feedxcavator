@@ -3,11 +3,11 @@
 This is the thing I always dreamed about, it is able to convert anything to RSS
 with an arbitrary level of fine-tuning by using CSS selectors. Because it's 
 designed as a Google App Engine application, and few people have GAE accounts, 
-know how to install GAE applications and want analyze web pages manually to 
+know how to install GAE applications and want to analyze web pages manually to 
 extract necessary data using CSS, probably no one would use it except me, 
 so here is what it looks like:
 
-<a href="https://github.com/GChristensen/feedxcavator/wiki/xcavator.png"><img src="https://github.com/GChristensen/feedxcavator/wiki/xcavator_thumb.png" /></a>
+<a href="https://github.com/GChristensen/feedxcavator/wiki/xcavator.png" target="_blank"><img src="https://github.com/GChristensen/feedxcavator/wiki/xcavator_thumb.png" /></a>
  
 I use it primarily to get updates about new releases of the shows by specific
 release groups at public torrent trackers and also for local newspapers and cinema news.
