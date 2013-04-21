@@ -7,7 +7,7 @@ know how to install GAE applications and want analyze web pages manually to
 extract necessary data using CSS, probably no one would use it except me, 
 so here is what it looks like:
 
-<a href="https://github.com/GChristensen/feedxcavator/wiki/xcavator.png"><img src="<img src="https://github.com/GChristensen/feedxcavator/wiki/xcavator_thumb.png" />" /></a>
+<a href="https://github.com/GChristensen/feedxcavator/wiki/xcavator.png"><img src="<img src="https://github.com/GChristensen/feedxcavator/wiki/xcavator_thumb.png" />"</a>
  
 I use it primarily to get updates about new releases of the shows by specific
 release groups at public torrent trackers and also for local newspapers and cinema news.
