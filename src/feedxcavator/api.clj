@@ -179,7 +179,7 @@ May return nil in case if this is not possible."
 (defapi perform-initialization
   "Performs platform-specific initialization."
   [handler]
-  :gae [ (ae/def-appengine-app feedxcavator-app handler) ])
+  :gae [ (ae/def-appengine-app feedxcavator-app handler #_:war-root #_"d:/sandbox/clojure/feedxcavator/war") ])
 
 ;; authentication ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

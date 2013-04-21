@@ -1,13 +1,16 @@
 # feedxcavator
 
-Feedxcavator is a HTML to RSS conversion application written entirely in Clojure 
-and ClojureScript. It uses a limited set of CSS selectors to extract content 
-of HTML pages and convert them to RSS feeds. You may find it useful if a web 
-page does not provide RSS and you are able to analyze the source code of that 
-page to write selectors for the data you interested in 
-([Firebug](http://getfirebug.com) or your browser development extensions may 
-greatly aid on this, although they not always map page source precisely).
+This is the thing I always dreamed about, it is able to convert anything to RSS
+with an arbitrary level of fine-tuning by using CSS selectors. Because it's 
+designed as a Google App Engine application, and few people have GAE accounts, 
+know how to install GAE applications and want analyze web pages manually to 
+extract necessary data using CSS, probably no one would use it except me, 
+so here is what it looks like:
 
+<a href="https://github.com/GChristensen/feedxcavator/wiki/xcavator.png"><img src="<img src="https://github.com/GChristensen/feedxcavator/wiki/xcavator_thumb.png" />" /></a>
+ 
+I use it primarily to get updates about new releases of the shows by specific
+release groups at public torrent trackers and also for local newspapers and cinema news.
 
 ### Supported CSS Subset
 
@@ -38,19 +41,6 @@ __feedxcavator__ will assume that elnive selectors are used if the selector
 string is wrapped in square brackets (e.g. [:div#some-id :> :h1.some-class 
 :> :a]) and will not try to convert them.
 
-### Usage
-
-You may use, share or edit your feeds with the links provided by the 
-[public deployment on GAE](http://feedxcavator.appspot.com) after the feed 
-creation. Feed manager is available only on private deployments.
-
-__Note:__ If you use a feed created by __feedxcavator__ with
-[Feedly](http://feedly.com) and you are the only subscriber, you will 
-get feed updates once per 3 hours or so, because this is the Google
-feed fetcher interval for feeds with a single subscriber. 
-If the target resource has been updated but the feed in Feedly hasn't, you 
-need to manually update it in Google Reader to get the update in Feedly.
-
 ### Private Deployment
 
 You may [install](http://code.google.com/appengine/docs/java/gettingstarted/uploading.html) 
@@ -73,7 +63,7 @@ and also comment out the following directive in project.clj:
 Do not forget to uncomment it when using 'appengine-prepare' command again 
 (these issues are related to appengine-magic library).
 * Compojure does not work on GAE as is, so to be able to deploy custom verson 
-of the application on GAE you need to comment out a couple of lines related 
+of the application on GAE you may need to comment out a couple of lines related 
 to multipart params in compojure's handler.clj file after you executed 
 'lein deps' command, starting, probably, from the maven local cache.
 

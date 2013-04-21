@@ -5,6 +5,7 @@
   (:require [feedxcavator.api :as api]
             [feedxcavator.editor :as editor]
             [feedxcavator.manager :as manager]
+            [feedxcavator.custom :as custom]
             [feedxcavator.excavation :as excv]
             [compojure.handler :as handler])
   (:use compojure.core))
@@ -30,6 +31,7 @@
 ;;  (GET "/subscribe" [feed] (manager/subscribe-route feed))
   (GET "/delete" [feed] (manager/delete-route feed))
   (GET "/manage" [] (manager/manage-route))
+  (GET "/custom" [] (custom/custom-route))
   (GET "/robots.txt" [] (api/text-page "User-agent: *"))
   (ANY "*" [] (api/page-not-found)))
 

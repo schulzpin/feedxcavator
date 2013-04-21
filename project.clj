@@ -1,7 +1,7 @@
 ;; Feedxcavator (a HTML to RSS converter)
 ;; (C) 2011 g/christensen (gchristnsn@gmail.com)
 
-(defproject feedxcavator "0.1.0"
+(defproject feedxcavator "0.2.0"
   :description "A HTML to RSS Converter"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/tools.macro "0.1.1"]
@@ -11,5 +11,5 @@
   :aot [feedxcavator.app_servlet
         feedxcavator.custom.atomid
         feedxcavator.custom.linkid
-        feedxcavator.custom.digg]
-  :dev-dependencies [[appengine-magic "0.4.6-SNAPSHOT"]])
+        feedxcavator.custom.regex]
+  :dev-dependencies [[appengine-magic "0.5.0"]])
